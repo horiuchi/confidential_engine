@@ -1,0 +1,33 @@
+{
+  "name": "backend-servers",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.xevo.com:9022/auto/noah/ararat/tools/confidential_engine.git"
+  },
+  "keywords": [
+    "aws",
+    "cdk"
+  ],
+  "author": "hhoriuchi",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.1.2",
+    "aws-cdk": "^2.79.0",
+    "esbuild": "^0.17.18",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.79.0",
+    "constructs": "^10.2.19",
+    "source-map-support": "^0.5.21"
+  }
+}
