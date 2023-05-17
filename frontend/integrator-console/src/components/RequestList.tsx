@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import type { MergedRequestItem } from '../actions/requests';
+import AppIcon from './AppIcon';
 
 export interface RequestListProps {
   list: MergedRequestItem[];
@@ -11,31 +11,26 @@ export interface RequestListProps {
 
 const RequestRow: FC<{ item: MergedRequestItem }> = ({ item }) => {
   return (
-    <>
-      <div className=''>
+    <tr>
+      <td>
         {item.url != null ? (
-          <Link href={item.url} className='text-blue-600 underline'>
+          <Link href={item.url} className='text-indigo-600 underline'>
             {item.id}
           </Link>
         ) : (
           item.id
         )}
-      </div>
-      <div className=''>{item.status}</div>
-      <div className='text-right'>{item.lastUpdated.toRelative()}</div>
-      <div className='flex'>
+      </td>
+      <td>{item.status}</td>
+      <td className='text-right'>{item.lastUpdated.toRelative()}</td>
+      <td className='flex'>
         {item.apps.map((app) => (
-          <Image
-            className='mr-1'
-            key={app.appId}
-            src={app.iconUrl}
-            alt={app.name}
-            width={48}
-            height={48}
-          />
+          <div className='mr-1' key={app.appId}>
+            <AppIcon app={app} />
+          </div>
         ))}
-      </div>
-    </>
+      </td>
+    </tr>
   );
 };
 
@@ -49,16 +44,21 @@ const RequestList: FC<RequestListProps> = (props) => {
   }, [list, filter]);
 
   return (
-    <div className='grid grid-cols-auto-4 items-center justify-items-stretch gap-2 text-xl'>
-      <div className='bg-slate-100 text-center font-bold'>ID</div>
-      <div className='bg-slate-100 text-center font-bold'>Status</div>
-      <div className='bg-slate-100 text-center font-bold'>Last Updated</div>
-      <div className='bg-slate-100 text-center font-bold'>Apps</div>
-
-      {filtered.map((item) => (
-        <RequestRow key={item.id} item={item} />
-      ))}
-    </div>
+    <table className='table-auto border-separate border-spacing-2'>
+      <thead>
+        <tr className='bg-indigo-50'>
+          <th className='rounded'>ID</th>
+          <th className='rounded'>Status</th>
+          <th className='rounded px-2'>Last Updated</th>
+          <th className='rounded'>Apps</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filtered.map((item) => (
+          <RequestRow key={item.id} item={item} />
+        ))}
+      </tbody>
+    </table>
   );
 };
 
