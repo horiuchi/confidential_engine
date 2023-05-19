@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { ulid } from 'ulid';
-import type { AppItem, RequestItem } from '../types';
+import type { AppItem, RequestItem, ShellItem } from '../types';
 
 export const defaultRequestList: RequestItem[] = [
   {
@@ -8,6 +8,7 @@ export const defaultRequestList: RequestItem[] = [
     status: 'Accepted',
     created: DateTime.local(),
     lastUpdated: DateTime.local(),
+    shellId: 'com.xevo.shell.glass',
     appIds: ['com.spotify.music'],
   },
   {
@@ -15,6 +16,7 @@ export const defaultRequestList: RequestItem[] = [
     status: 'Building',
     created: DateTime.local().plus({ minutes: -3 }),
     lastUpdated: DateTime.local().plus({ minutes: -2 }),
+    shellId: 'com.xevo.shell.glass',
     appIds: ['com.xevo.apps.mail', 'com.xevo.apps.maps'],
   },
   {
@@ -22,6 +24,7 @@ export const defaultRequestList: RequestItem[] = [
     status: 'Finished',
     created: DateTime.local().plus({ minutes: -12 }),
     lastUpdated: DateTime.local().plus({ minutes: -8 }),
+    shellId: 'com.xevo.shell.glass',
     appIds: ['com.spotify.music', 'com.xevo.apps.music', 'com.xevo.apps.phone'],
     url: '/data/result.zip',
   },
@@ -30,6 +33,7 @@ export const defaultRequestList: RequestItem[] = [
     status: 'Finished',
     created: DateTime.local().plus({ minutes: -18 }),
     lastUpdated: DateTime.local().plus({ minutes: -13 }),
+    shellId: 'com.xevo.shell.glass',
     appIds: [
       'com.xevo.apps.mail',
       'com.xevo.apps.maps',
@@ -42,7 +46,26 @@ export const defaultRequestList: RequestItem[] = [
     status: 'Failed',
     created: DateTime.local().plus({ minutes: -23 }),
     lastUpdated: DateTime.local().plus({ minutes: -22 }),
+    shellId: 'jp.lexus.shell',
     appIds: ['com.xevo.apps.weather'],
+  },
+];
+
+export const defaultShellList: ShellItem[] = [
+  {
+    id: 'com.xevo.shell.glass',
+    name: 'Glass',
+    iconUrl: '/icons/ic_shell_glass.png',
+  },
+  {
+    id: 'jp.lexus.shell',
+    name: 'Lexus',
+    iconUrl: '/icons/ic_shell_lexus.png',
+  },
+  {
+    id: 'jp.toyota.shell',
+    name: 'Toyota',
+    iconUrl: '/icons/ic_shell_toyota.png',
   },
 ];
 

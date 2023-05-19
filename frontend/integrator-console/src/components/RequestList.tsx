@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import type { MergedRequestItem } from '../actions/requests';
-import AppIcon from './AppIcon';
+import { AppIcon, ShellIcon } from './Icons';
 
 export interface RequestListProps {
   list: MergedRequestItem[];
@@ -23,6 +23,9 @@ const RequestRow: FC<{ item: MergedRequestItem }> = ({ item }) => {
       </td>
       <td>{item.status}</td>
       <td className='text-right'>{item.lastUpdated.toRelative()}</td>
+      <td>
+        <ShellIcon shell={item.shell} />
+      </td>
       <td className='flex'>
         {item.apps.map((app) => (
           <div className='mr-1' key={app.appId}>
@@ -50,6 +53,7 @@ const RequestList: FC<RequestListProps> = (props) => {
           <th className='rounded'>ID</th>
           <th className='rounded'>Status</th>
           <th className='rounded px-2'>Last Updated</th>
+          <th className='rounded'>Shell</th>
           <th className='rounded'>Apps</th>
         </tr>
       </thead>

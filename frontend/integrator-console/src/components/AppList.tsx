@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import type { AppItem } from '../types';
-import AppIcon from './AppIcon';
+import { AppIcon } from './Icons';
 
 export interface AppListProps {
   list: AppItem[];

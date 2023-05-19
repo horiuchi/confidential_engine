@@ -5,6 +5,7 @@ export interface RequestItem {
   status: RequestStatus;
   lastUpdated: DateTime;
   created: DateTime;
+  shellId: string;
   appIds: string[];
   url?: string;
 }
@@ -15,6 +16,12 @@ export type RequestStatus =
   | 'Finished'
   | 'Rejected'
   | 'Failed';
+
+export interface ShellItem {
+  id: string;
+  name: string;
+  iconUrl: string;
+}
 
 export interface AppItem {
   appId: string;
