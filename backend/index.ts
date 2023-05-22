@@ -7,10 +7,16 @@ import {
   BucketAccessControl,
   BucketEncryption,
 } from 'aws-cdk-lib/aws-s3';
-import { Effect, PolicyStatement, StarPrincipal } from 'aws-cdk-lib/aws-iam';
 import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 import { Repository } from 'aws-cdk-lib/aws-codecommit';
 import * as amplify from '@aws-cdk/aws-amplify-alpha';
+import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import {
+  AwsIntegration,
+  MethodLoggingLevel,
+  PassthroughBehavior,
+  RestApi,
+} from 'aws-cdk-lib/aws-apigateway';
 
 const app = new App();
 
@@ -46,17 +52,74 @@ const artifactStorage = new Bucket(
   stack,
   'ConfidentialEngine-ArtifactStorage',
   {
+    accessControl: BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
     blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
-    publicReadAccess: true,
   },
 );
-artifactStorage.addToResourcePolicy(
-  new PolicyStatement({
-    effect: Effect.ALLOW,
-    principals: [new StarPrincipal()],
-    actions: ['s3:GetObject'],
-    resources: [`${artifactStorage.bucketArn}/*`],
+
+// API Gateway
+const restApiRole = new Role(stack, 'Role', {
+  assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
+  path: '/',
+});
+artifactStorage.grantRead(restApiRole);
+
+const restApi = new RestApi(stack, 'ConfidentialEngine-RestApi', {
+  restApiName: 'confidential-engine-api',
+  deployOptions: {
+    stageName: 'v1',
+    loggingLevel: MethodLoggingLevel.INFO,
+    dataTraceEnabled: true,
+  },
+  binaryMediaTypes: ['*/*'],
+});
+
+const artifacts = restApi.root.addResource('artifacts');
+const fileName = artifacts.addResource('{fileName}');
+fileName.addMethod(
+  'GET',
+  new AwsIntegration({
+    service: 's3',
+    integrationHttpMethod: 'GET',
+    path: `${artifactStorage.bucketName}/{fileName}`,
+    options: {
+      credentialsRole: restApiRole,
+      passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+      requestParameters: {
+        'integration.request.header.Accept': 'method.request.header.Accept',
+        'integration.request.path.fileName': 'method.request.path.fileName',
+      },
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Timestamp':
+              'integration.response.header.Date',
+            'method.response.header.Content-Length':
+              'integration.response.header.Content-Length',
+            'method.response.header.Content-Type':
+              'integration.response.header.Content-Type',
+          },
+        },
+      ],
+    },
   }),
+  {
+    requestParameters: {
+      'method.request.header.Accept': true,
+      'method.request.path.fileName': true,
+    },
+    methodResponses: [
+      {
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Timestamp': true,
+          'method.response.header.Content-Length': true,
+          'method.response.header.Content-Type': true,
+        },
+      },
+    ],
+  },
 );
 
 // Amplify Hosting
@@ -116,4 +179,7 @@ new CfnOutput(stack, 'RequestListTableName', {
 });
 new CfnOutput(stack, 'RepositoryArn', { value: appRepository.bucketArn });
 new CfnOutput(stack, 'StorageArn', { value: artifactStorage.bucketArn });
-new CfnOutput(stack, 'IntegratorConsoleUrl', { value: integratorConsoleApp.defaultDomain });
+new CfnOutput(stack, 'RestApiUrl', { value: restApi.url });
+new CfnOutput(stack, 'IntegratorConsoleUrl', {
+  value: integratorConsoleApp.defaultDomain,
+});
